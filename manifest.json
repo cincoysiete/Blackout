@@ -1,0 +1,22 @@
+{
+    "short_name": "BlackOut",
+    "name": "BlackOut",
+    "description": "Gestión de desconexiones domésticas",
+    "icons": [
+        {
+            "src": "favicon.png",
+            "type": "image/png",
+            "sizes": "192x192"
+        },
+        {
+            "src": "favicon.png",
+            "type": "image/png",
+            "sizes": "512x512"
+        }
+    ],
+    "start_url": "https://cincoysiete.net/blackout/index.php",
+    "background_color": "#FFFFFF",
+    "display": "standalone",
+    "scope": "/blackout",
+    "theme_color": "#FFFFFF"
+}
