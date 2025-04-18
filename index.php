@@ -1,11 +1,9 @@
-
 <!-- INICIALIZACION -->
     <?php
     session_start();
     header("Refresh: 10");
     header('Content-Type: text/html; charset=utf-8');
     date_default_timezone_set('Europe/Madrid');
-    // $logFile = 'blackout_log.txt';
     // EN HISTORICO.TXT SE ALMACENAN TODOS LOS MENSAJES GENERADOS POR LA APLICACION O LLEGADOS DESDE LA ESP8266
     $historico='historico.txt';
     // EN INCIDENCIA.TXT SE ALMACENA LA ULTIMA INCIDENCIA OCURRIDA: DESCONEXION, FALTA LUZ O FALTA WIFI
@@ -14,8 +12,6 @@
     $lastReconnectFile = 'ultimaconexion.txt';
     // EN estadotelegram.txt SE ALMACENA NADA O UN si EN CASO DE QUE LA ESP SEA LA ENCARGADA DE ENVIAR MENSAJES A TELEGRAM
     $estadoTelegramFile = 'estadotelegram.txt';
-    // $maxFileSize = 1024 * 1024;
-    // $lastMessageIdFile = 'last_message_id.txt';
 
 // CONFIGURACION DE TELEGRAM
     include("config.php");
@@ -25,11 +21,10 @@
 
 // FUNCION PARA ENVIAR MENSAJES A TELEGRAM
     function sendTelegramNotification($message, $apiUrl, $chatId) {
-    global $lastMessageIdFile;
-
     $data = [
         'chat_id' => $chatId,
-        'text' => $message
+        'text' => $message,
+        // 'parse_mode' => 'HTML'
     ];
 
     $options = [
@@ -37,7 +32,7 @@
             'header' => "Content-type: application/x-www-form-urlencoded\r\n",
             'method' => 'POST',
             'content' => http_build_query($data),
-            'ignore_errors' => true
+            'ignore_errors' => true // Para capturar errores HTTP
         ]
     ];
 
@@ -50,66 +45,18 @@
         return false;
     }
 
+    // Decodificar respuesta de Telegram
     $responseData = json_decode($result, true);
 
+    // Verificar que la API respondió bien y extraer message_id
     if (isset($responseData['ok']) && $responseData['ok'] && isset($responseData['result']['message_id'])) {
-        // Guardamos el ID del último mensaje enviado
-        file_put_contents($lastMessageIdFile, $responseData['result']['message_id']);
         return $responseData['result']['message_id'];
     } else {
+        // Log opcional si algo salió mal
         file_put_contents('telegram_errors.log', date('Y-m-d H:i:s')." - Respuesta inesperada: ".$result."\n", FILE_APPEND);
         return false;
     }
     }
-
-// FUNCION PARA ELIMINAR MENSAJES EN TELEGRAM
-    // function deleteTelegramMessage($apiUrl, $chatId) {
-    // global $lastMessageIdFile;
-
-    // if (!file_exists($lastMessageIdFile)) {
-    //     file_put_contents('telegram_errors.log', date('Y-m-d H:i:s')." - Error: Archivo last_message_id.txt no encontrado\n", FILE_APPEND);
-    //     return false;
-    // }
-
-    // $messageId = trim(file_get_contents($lastMessageIdFile));
-
-    // if (empty($messageId)) {
-    //     file_put_contents('telegram_errors.log', date('Y-m-d H:i:s')." - Error: ID de mensaje vacío\n", FILE_APPEND);
-    //     return false;
-    // }
-
-    // $data = [
-    //     'chat_id' => $chatId,
-    //     'message_id' => $messageId
-    // ];
-
-    // $options = [
-    //     'http' => [
-    //         'header' => "Content-type: application/x-www-form-urlencoded\r\n",
-    //         'method' => 'POST',
-    //         'content' => http_build_query($data),
-    //         'ignore_errors' => true
-    //     ]
-    // ];
-
-    // $context = stream_context_create($options);
-    // $result = @file_get_contents($apiUrl . "/deleteMessage", false, $context);
-
-    // if ($result === false) {
-    //     $error = error_get_last();
-    //     file_put_contents('telegram_errors.log', date('Y-m-d H:i:s')." - Error: ".$error['message']."\n", FILE_APPEND);
-    //     return false;
-    // }
-
-    // $responseData = json_decode($result, true);
-
-    // if (isset($responseData['ok']) && $responseData['ok']) {
-    //     return true;
-    // } else {
-    //     file_put_contents('telegram_errors.log', date('Y-m-d H:i:s')." - Respuesta inesperada: ".$result."\n", FILE_APPEND);
-    //     return false;
-    // }
-    // }
 
 // GUARDA LA HORA EN UN ARCHIVO
     $timestamp = date('Y-m-d H:i');
@@ -191,14 +138,13 @@
 
     // CADA CIERTO TIEMPO (CONFIGURADO EN LA ESP) ENVIA UN TELEGRAM COMUNICANDO QUE EL SISTEMA FUNCIONA. SOLO SI HEMOS CONFIGURADO LA ESP PARA QUE NO ENVIE TELEGRAM
     if (substr($message,0,4)== 'Bien'){
-        // deleteTelegramMessage($telegramAPIUrl, $telegramChatID);
         $mensa="Web: ".explode(";",$message)[1]."\n";
         if (trim(file_get_contents($estadoTelegramFile))!="si"){sendTelegramNotification($mensa, $telegramAPIUrl, $telegramChatID);}
     }
 
     }
 
-    // http_response_code(400);
+    // http_response_code(200);
 
     $estado=$ultimahistoria;
     $noque=file_get_contents($incidencia);
