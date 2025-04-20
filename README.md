@@ -7,8 +7,6 @@
 
 Este manual está diseñado para que cualquier usuario comprenda el funcionamiento general del sistema de monitoreo basado en **[ESP8266🔗](https://es.aliexpress.com/item/1005008285868316.html?spm=a2g0o.order_list.order_list_main.15.5ad3194dwJRqke&gatewayAdapt=glo2esp) con pantalla de 0.9”** y servidor web PHP, incluyendo su integración con **Telegram**.
 
-![S3590cd3747434bdead931e3ae90ee80cG](https://github.com/user-attachments/assets/cd0fb5c5-eac9-45aa-8296-2266bb9888d3)
-
 El sistema permite detectar cortes de energía, pérdidas de conexión WiFi o fallos en la red, notificando en tiempo real al usuario por medio de:
 - Mensajes automáticos al servidor PHP.
 - Notificaciones en Telegram.
@@ -67,4 +65,8 @@ El sistema permite tanto monitoreo local como remoto, con avisos claros y autom�
 - Se recupera el servicio.
 
 De esta forma siempre estarás informado de lo que ocurre, y podrás actuar rápidamente si algo va mal, mejorando la seguridad y fiabilidad de tus instalaciones.
+
+---
+
+![S3590cd3747434bdead931e3ae90ee80cG](https://github.com/user-attachments/assets/cd0fb5c5-eac9-45aa-8296-2266bb9888d3)
 
